@@ -149,6 +149,18 @@ chats.forEach(c => {
 
 });
 
+const ChatContainer = ({user, storage}: {user: User, storage: IStorage}) => {
+    return (
+        <ChatProvider serviceFactory={serviceFactory} storage={storage} config={{
+            typingThrottleTime: 250,
+            typingDebounceTime: 900,
+            debounceTyping: true,
+            autoDraft: AutoDraft.Save | AutoDraft.Restore
+        }}>
+            <Chat user={user}/>
+        </ChatProvider>)
+}
+
 function App() {
 
     return (
@@ -156,46 +168,18 @@ function App() {
             <Container fluid className="p-4 flex-grow-1 position-relative overflow-hidden">
                 <Row className="h-50 pb-2 flex-nowrap">
                     <Col>
-                        <ChatProvider serviceFactory={serviceFactory} storage={akaneStorage} config={{
-                            typingThrottleTime: 250,
-                            typingDebounceTime: 900,
-                            debounceTyping: true,
-                            autoDraft: AutoDraft.Save | AutoDraft.Restore
-                        }}>
-                            <Chat user={akane}/>
-                        </ChatProvider>
+                        <ChatContainer user={akane} storage={akaneStorage} />
                     </Col>
                     <Col>
-                        <ChatProvider serviceFactory={serviceFactory} storage={eliotStorage} config={{
-                            typingThrottleTime: 250,
-                            typingDebounceTime: 900,
-                            debounceTyping: true,
-                            autoDraft: AutoDraft.Save | AutoDraft.Restore
-                        }}>
-                            <Chat user={eliot}/>
-                        </ChatProvider>
+                        <ChatContainer user={eliot} storage={eliotStorage} />
                     </Col>
                 </Row>
                 <Row className="h-50 pt-2 flex-nowrap">
                     <Col>
-                        <ChatProvider serviceFactory={serviceFactory} storage={emilyStorage} config={{
-                            typingThrottleTime: 250,
-                            typingDebounceTime: 900,
-                            debounceTyping: true,
-                            autoDraft: AutoDraft.Save | AutoDraft.Restore
-                        }}>
-                            <Chat user={emily}/>
-                        </ChatProvider>
+                        <ChatContainer user={emily} storage={emilyStorage} />
                     </Col>
                     <Col>
-                        <ChatProvider serviceFactory={serviceFactory} storage={joeStorage} config={{
-                            typingThrottleTime: 250,
-                            typingDebounceTime: 900,
-                            debounceTyping: true,
-                            autoDraft: AutoDraft.Save | AutoDraft.Restore
-                        }}>
-                            <Chat user={joe}/>
-                        </ChatProvider>
+                        <ChatContainer user={joe} storage={joeStorage} />
                     </Col>
                 </Row>
             </Container>
