@@ -22,28 +22,9 @@ import {
   MessageContentType,
   MessageDirection,
   MessageStatus,
+  Participant,
 } from '@chatscope/use-chat'
 import { MessageContent, TextContent, User } from '@chatscope/use-chat'
-
-const createPreview = (users: User[]) => {
-  switch (users.length) {
-    case 0:
-      return [undefined, undefined]
-    case 1:
-      const user = users[0]
-      return [<Avatar src={user.avatar} />, user.username]
-    default:
-      const avatar = (
-        <AvatarGroup size="sm">
-          {users.map(user => (
-            <Avatar src={user.avatar} name={user.username} />
-          ))}
-        </AvatarGroup>
-      )
-      const name = users.map(u => u.username).join(', ')
-      return [avatar, name]
-  }
-}
 
 export const Chat = ({ user }: { user: User }) => {
   // Get all chat related values and methods from useChat hook
@@ -64,23 +45,38 @@ export const Chat = ({ user }: { user: User }) => {
     setCurrentUser(user)
   }, [user, setCurrentUser])
 
+  const createPreview = (participants: Participant[]) => {
+    const users = participants
+      .map(p => getUser(p.id))
+      .filter(u => u !== undefined) as User[]
+
+    switch (users.length) {
+      case 0:
+        return [undefined, undefined]
+      case 1:
+        const user = users[0]
+        return [<Avatar src={user.avatar} />, user.username]
+      default:
+        const avatar = (
+          <AvatarGroup size="sm">
+            {users.map(user => (
+              <Avatar src={user.avatar} name={user.username} />
+            ))}
+          </AvatarGroup>
+        )
+        const name = users.map(u => u.username).join(', ')
+        return [avatar, name]
+    }
+  }
+
   // Get current user data
   const [currentUserAvatar, currentUserName] = useMemo(() => {
-    if (activeConversation) {
-      const participant =
-        activeConversation.participants.length > 0
-          ? activeConversation.participants[0]
-          : undefined
-
-      if (participant) {
-        const user = getUser(participant.id)
-        if (user) {
-          return [<Avatar src={user.avatar} />, user.username]
-        }
-      }
+    if (!activeConversation) {
+      return [undefined, undefined]
     }
 
-    return [undefined, undefined]
+    const participants = activeConversation.participants
+    return createPreview(participants)
   }, [activeConversation, getUser])
 
   const handleChange = (value: string) => {
@@ -120,26 +116,28 @@ export const Chat = ({ user }: { user: User }) => {
   }
 
   const getTypingIndicator = useCallback(() => {
-    if (activeConversation) {
-      const typingUsers = activeConversation.typingUsers
-
-      if (typingUsers.length > 0) {
-        const typingUserId = typingUsers.items[0].userId
-
-        // Check if typing user participates in the conversation
-        if (activeConversation.participantExists(typingUserId)) {
-          const typingUser = getUser(typingUserId)
-
-          if (typingUser) {
-            return (
-              <TypingIndicator content={`${typingUser.username} is typing`} />
-            )
-          }
-        }
-      }
+    if (!activeConversation) {
+      return undefined
     }
 
-    return undefined
+    const typingUsers = activeConversation.typingUsers
+    if (typingUsers.length == 0) {
+      return undefined
+    }
+
+    const typingUserId = typingUsers.items[0].userId
+
+    // Check if typing user participates in the conversation
+    if (!activeConversation.participantExists(typingUserId)) {
+      return undefined
+    }
+
+    const typingUser = getUser(typingUserId)
+    if (!typingUser) {
+      return undefined
+    }
+
+    return <TypingIndicator content={`${typingUser.username} is typing`} />
   }, [activeConversation, getUser])
 
   return (
@@ -156,11 +154,7 @@ export const Chat = ({ user }: { user: User }) => {
             // Helper for getting the data of the first participant
 
             // TODO: useMEMO?
-            const [avatar, name] = createPreview(
-              c.participants
-                .map(p => getUser(p.id))
-                .filter(u => u !== undefined) as User[],
-            )
+            const [avatar, name] = createPreview(c.participants)
 
             return (
               <ConversationComponent
