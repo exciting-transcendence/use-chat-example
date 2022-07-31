@@ -4,7 +4,8 @@ import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css'
 import { Col, Container, Row } from 'react-bootstrap'
 
 import { ChatComponent } from './components/ChatContainer'
-import { mockUserDatabase, createChat } from './utils'
+import { createChat } from './utils'
+import { mockUserDatabase } from './data'
 
 const [akane, eliot, emily, joe] = Array.from(Object.values(mockUserDatabase))
 
