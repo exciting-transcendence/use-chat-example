@@ -4,7 +4,7 @@ import {
   MainContainer,
   Sidebar,
   ConversationList,
-  Conversation,
+  Conversation as ConversationComponent,
   Avatar,
   ChatContainer,
   ConversationHeader,
@@ -24,6 +24,26 @@ import {
   MessageStatus,
 } from '@chatscope/use-chat'
 import { MessageContent, TextContent, User } from '@chatscope/use-chat'
+
+const createPreview = (users: User[]) => {
+  switch (users.length) {
+    case 0:
+      return [undefined, undefined]
+    case 1:
+      const user = users[0]
+      return [<Avatar src={user.avatar} />, user.username]
+    default:
+      const avatar = (
+        <AvatarGroup size="sm">
+          {users.map(user => (
+            <Avatar src={user.avatar} name={user.username} />
+          ))}
+        </AvatarGroup>
+      )
+      const name = users.map(u => u.username).join(', ')
+      return [avatar, name]
+  }
+}
 
 export const Chat = ({ user }: { user: User }) => {
   // Get all chat related values and methods from useChat hook
@@ -134,35 +154,16 @@ export const Chat = ({ user }: { user: User }) => {
         <ConversationList>
           {conversations.map(c => {
             // Helper for getting the data of the first participant
-            const [avatar, name] = (() => {
-              if (c.participants.length == 0) {
-                return [undefined, undefined]
-              } else if (c.participants.length == 1) {
-                const participant = c.participants[0]
-                const user = getUser(participant.id)
-                if (user) {
-                  return [<Avatar src={user.avatar} />, user.username]
-                }
-              } else {
-                const users = c.participants
-                  .map(p => getUser(p.id))
-                  .filter(u => u !== undefined) as User[]
 
-                const avatar = (
-                  <AvatarGroup size="sm">
-                    {users.map(user => (
-                      <Avatar src={user.avatar} name={user.username} />
-                    ))}
-                  </AvatarGroup>
-                )
-                const name = c.participants.map(p => p.id).join(', ')
-                return [avatar, name]
-              }
-              return [undefined, undefined]
-            })()
+            // TODO: useMEMO?
+            const [avatar, name] = createPreview(
+              c.participants
+                .map(p => getUser(p.id))
+                .filter(u => u !== undefined) as User[],
+            )
 
             return (
-              <Conversation
+              <ConversationComponent
                 key={c.id}
                 name={name}
                 info={
@@ -177,7 +178,7 @@ export const Chat = ({ user }: { user: User }) => {
                 onClick={() => setActiveConversation(c.id)}
               >
                 {avatar}
-              </Conversation>
+              </ConversationComponent>
             )
           })}
         </ConversationList>
