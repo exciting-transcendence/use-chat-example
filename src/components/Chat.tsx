@@ -151,9 +151,6 @@ export const Chat = ({ user }: { user: User }) => {
         </ConversationHeader>
         <ConversationList>
           {conversations.map(c => {
-            // Helper for getting the data of the first participant
-
-            // TODO: useMEMO?
             const [avatar, name] = createPreview(c.participants)
 
             return (
