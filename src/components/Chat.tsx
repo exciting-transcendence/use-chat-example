@@ -13,6 +13,7 @@ import {
   MessageList,
   MessageInput,
   TypingIndicator,
+  AvatarGroup,
 } from '@chatscope/chat-ui-kit-react'
 
 import {
@@ -134,16 +135,29 @@ export const Chat = ({ user }: { user: User }) => {
           {conversations.map(c => {
             // Helper for getting the data of the first participant
             const [avatar, name] = (() => {
-              const participant =
-                c.participants.length > 0 ? c.participants[0] : undefined
-
-              if (participant) {
+              if (c.participants.length == 0) {
+                return [undefined, undefined]
+              } else if (c.participants.length == 1) {
+                const participant = c.participants[0]
                 const user = getUser(participant.id)
                 if (user) {
                   return [<Avatar src={user.avatar} />, user.username]
                 }
-              }
+              } else {
+                const users = c.participants
+                  .map(p => getUser(p.id))
+                  .filter(u => u !== undefined) as User[]
 
+                const avatar = (
+                  <AvatarGroup size="sm">
+                    {users.map(user => (
+                      <Avatar src={user.avatar} name={user.username} />
+                    ))}
+                  </AvatarGroup>
+                )
+                const name = c.participants.map(p => p.id).join(', ')
+                return [avatar, name]
+              }
               return [undefined, undefined]
             })()
 
