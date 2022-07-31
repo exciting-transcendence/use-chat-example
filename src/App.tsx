@@ -29,12 +29,12 @@ import {
   users,
 } from './data/data'
 import { AutoDraft } from '@chatscope/use-chat/dist/enums/AutoDraft'
-import { Footer } from './components/Footer'
 
 // sendMessage and addMessage methods can automagically generate id for messages and groups
 // This allows you to omit doing this manually, but you need to provide a message generator
 // The message id generator is a function that receives message and returns id for this message
 // The group id generator is a function that returns string
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const messageIdGenerator = (message: ChatMessage<MessageContentType>) =>
   nanoid()
 const groupIdGenerator = () => nanoid()
@@ -132,30 +132,26 @@ const newUser = (u: { name: string; avatar: string }) => {
   })
 }
 
-const isMyConversation = (storage: IStorage, name: string) => {
-  const conversations = storage.getState().conversations
-  const foo = (cv: Conversation) =>
-    typeof cv.participants.find(p => p.id === name) !== 'undefined'
+const conversationGetParticipant = (cv: Conversation, name: string) =>
+  cv.participants.find(p => p.id === name)
 
-  return Boolean(conversations.find(foo))
-}
+const storageGetParticipant = (storage: IStorage, name: string) =>
+  storage
+    .getState()
+    .conversations.find(cv => conversationGetParticipant(cv, name))
 
 chats.forEach(c => {
   const otherUsers = users.filter(u => u.name !== c.name)
   otherUsers.forEach(u => c.storage.addUser(newUser(u)))
 
-  const foo = otherUsers.filter(u => !isMyConversation(c.storage, u.name))
+  const foo = otherUsers.filter(u => !storageGetParticipant(c.storage, u.name))
 
   foo.forEach(u => {
     const conversationId = nanoid()
     c.storage.addConversation(createConversation(conversationId, u.name))
 
     const myChat = chats.find(chat => chat.name === u.name)
-    if (!myChat) {
-      return
-    }
-
-    if (!isMyConversation(myChat.storage, c.name)) {
+    if (myChat && !storageGetParticipant(myChat.storage, c.name)) {
       myChat.storage.addConversation(createConversation(conversationId, c.name))
     }
   })
@@ -208,7 +204,6 @@ function App() {
           </Col>
         </Row>
       </Container>
-      <Footer />
     </div>
   )
 }
