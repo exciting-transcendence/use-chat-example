@@ -6,6 +6,7 @@ import {
   ChatMessage,
   IStorage,
   MessageContentType,
+  User,
 } from '@chatscope/use-chat'
 import { nanoid } from 'nanoid'
 import { Col, Container, Row } from 'react-bootstrap'
@@ -37,6 +38,10 @@ const akane = newUser(akaneModel)
 const emily = newUser(emilyModel)
 const eliot = newUser(eliotModel)
 const joe = newUser(joeModel)
+interface MockDB {
+  user: User
+  storage: IStorage
+}
 
 type chatData = {
   name: string

@@ -8,7 +8,7 @@ import {
   Avatar,
   ChatContainer,
   ConversationHeader,
-  MessageGroup,
+  MessageGroup as MessageGroupComponent,
   Message,
   MessageList,
   MessageInput,
@@ -25,6 +25,7 @@ import {
   Participant,
 } from '@chatscope/use-chat'
 import { MessageContent, TextContent, User } from '@chatscope/use-chat'
+import { MessageGroup } from '@chatscope/use-chat/dist/MessageGroup'
 
 export const Chat = ({ user }: { user: User }) => {
   // Get all chat related values and methods from useChat hook
@@ -60,7 +61,7 @@ export const Chat = ({ user }: { user: User }) => {
         const avatar = (
           <AvatarGroup size="sm">
             {users.map(user => (
-              <Avatar src={user.avatar} name={user.username} />
+              <Avatar key={user.id} src={user.avatar} name={user.username} />
             ))}
           </AvatarGroup>
         )
@@ -140,6 +141,12 @@ export const Chat = ({ user }: { user: User }) => {
     return <TypingIndicator content={`${typingUser.username} is typing`} />
   }, [activeConversation, getUser])
 
+  const getMessageAvatar = (g: MessageGroup) => {
+    const sender = getUser(g.senderId)
+    // FIXME: didn't check if user was self but it works
+    return sender ? <Avatar src={sender.avatar} /> : null
+  }
+
   return (
     <MainContainer responsive>
       <Sidebar position="left" scrollable>
@@ -185,8 +192,11 @@ export const Chat = ({ user }: { user: User }) => {
         <MessageList typingIndicator={getTypingIndicator()}>
           {activeConversation &&
             currentMessages.map(g => (
-              <MessageGroup key={g.id} direction={g.direction}>
-                <MessageGroup.Messages>
+              <MessageGroupComponent key={g.id} direction={g.direction}>
+                {activeConversation.participants.length >= 2
+                  ? getMessageAvatar(g)
+                  : null}
+                <MessageGroupComponent.Messages>
                   {g.messages.map((m: ChatMessage<MessageContentType>) => (
                     <Message
                       key={m.id}
@@ -198,8 +208,8 @@ export const Chat = ({ user }: { user: User }) => {
                       }}
                     />
                   ))}
-                </MessageGroup.Messages>
-              </MessageGroup>
+                </MessageGroupComponent.Messages>
+              </MessageGroupComponent>
             ))}
         </MessageList>
         <MessageInput
