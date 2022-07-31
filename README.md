@@ -1,24 +1,25 @@
-# use-chat example
+# use-chat 사용례
 
-This is an example of the basic use of the [use-chat](https://github.com/chatscope/use-chat) library.
+리액트 훅 라이브러리 [use-chat](https://github.com/chatscope/use-chat)의 간단한 사용례. 데이터는 현재 모두 로컬에서 저장
 
-Working app is available here: [https://use-chat.examples.chatscope.io](https://use-chat.examples.chatscope.io).
+[온라인 데모 링크](https://exciting-transcendence.github.io/use-chat-example/).
 
-For more information please visit [https://github.com/chatscope/use-chat](https://github.com/chatscope/use-chat).
+원레 레포지토리: [https://github.com/chatscope/use-chat](https://github.com/chatscope/use-chat).
 
-Also, you can be interested in my React chat components library [https://github.com/chatscope/chat-ui-kit-react](https://github.com/chatscope/chat-ui-kit-react)
+리액트 채팅 컴포넌트 라이브러리: [https://github.com/chatscope/chat-ui-kit-react](https://github.com/chatscope/chat-ui-kit-react)
 
-Project website: [https://chatscope.io](https://chatscope.io)
+라이브러리 홈페이지: [https://chatscope.io](https://chatscope.io)
 
-# Usage
-This application is based on [CRA](https://create-react-app.dev/).  
-Clone the repository and run:
+# 사용법
+
+[Create React App (CRA)](https://create-react-app.dev/) 기반
 
 ```console
 $ yarn run start
 ```
 
-or:
+또는
+
 ```console
 $ npm run start
 ```
