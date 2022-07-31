@@ -1,14 +1,9 @@
-import { AutoDraft, ChatProvider, IStorage, User } from '@chatscope/use-chat'
+import { AutoDraft, ChatProvider } from '@chatscope/use-chat'
 import { serviceFactory } from '../service'
+import { UserEntry } from '../utils'
 import { Chat } from './Chat'
 
-export const ChatComponent = ({
-  user,
-  storage,
-}: {
-  user: User
-  storage: IStorage
-}) => {
+export const ChatComponent = ({ user, storage }: UserEntry) => {
   return (
     <ChatProvider
       serviceFactory={serviceFactory}
