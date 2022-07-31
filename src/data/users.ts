@@ -10,7 +10,7 @@ import { nanoid } from 'nanoid'
 import { akaneModel, eliotModel, emilyModel, joeModel, users } from './data'
 
 const akane = new User({
-  id: akaneModel.name,
+  id: nanoid(),
   presence: new Presence({ status: UserStatus.Available, description: '' }),
   firstName: '',
   lastName: '',
@@ -21,7 +21,7 @@ const akane = new User({
 })
 
 const emily = new User({
-  id: emilyModel.name,
+  id: nanoid(),
   presence: new Presence({ status: UserStatus.Available, description: '' }),
   firstName: '',
   lastName: '',
@@ -32,7 +32,7 @@ const emily = new User({
 })
 
 const eliot = new User({
-  id: eliotModel.name,
+  id: nanoid(),
   presence: new Presence({ status: UserStatus.Available, description: '' }),
   firstName: '',
   lastName: '',
@@ -43,7 +43,7 @@ const eliot = new User({
 })
 
 const joe = new User({
-  id: joeModel.name,
+  id: nanoid(),
   presence: new Presence({ status: UserStatus.Available, description: '' }),
   firstName: '',
   lastName: '',
