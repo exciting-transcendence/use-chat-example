@@ -100,15 +100,15 @@ const chats = [
   { name: 'Joe', storage: joeStorage },
 ]
 
-function createConversation(id: ConversationId, name: string): Conversation {
+function createConversation(id: ConversationId, names: string[]): Conversation {
   return new Conversation({
     id,
-    participants: [
-      new Participant({
+    participants: names.map(name => {
+      return new Participant({
         id: name,
         role: new ConversationRole([]),
-      }),
-    ],
+      })
+    }),
     unreadCounter: 0,
     typingUsers: new TypingUsersList({ items: [] }),
     draft: '',
@@ -144,15 +144,19 @@ chats.forEach(c => {
   const otherUsers = users.filter(u => u.name !== c.name)
   otherUsers.forEach(u => c.storage.addUser(newUser(u)))
 
-  const foo = otherUsers.filter(u => !storageGetParticipant(c.storage, u.name))
+  const usersThatIsntParticipant = otherUsers.filter(
+    u => !storageGetParticipant(c.storage, u.name),
+  )
 
-  foo.forEach(u => {
+  usersThatIsntParticipant.forEach(u => {
     const conversationId = nanoid()
-    c.storage.addConversation(createConversation(conversationId, u.name))
+    c.storage.addConversation(createConversation(conversationId, [u.name]))
 
     const myChat = chats.find(chat => chat.name === u.name)
     if (myChat && !storageGetParticipant(myChat.storage, c.name)) {
-      myChat.storage.addConversation(createConversation(conversationId, c.name))
+      myChat.storage.addConversation(
+        createConversation(conversationId, [c.name]),
+      )
     }
   })
 })
