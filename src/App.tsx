@@ -141,10 +141,6 @@ const storageGetParticipant = (storage: IStorage, name: string) =>
     .conversations.find(cv => conversationGetParticipant(cv, name))
 
 const groupChatId = nanoid()
-const groupConversation = createConversation(
-  groupChatId,
-  users.map(u => u.name),
-)
 
 chats.forEach(c => {
   const otherUsers = users.filter(u => u.name !== c.name)
@@ -166,6 +162,10 @@ chats.forEach(c => {
     }
   })
 
+  const groupConversation = createConversation(
+    groupChatId,
+    users.map(u => u.name),
+  )
   c.storage.addConversation(groupConversation)
 })
 
