@@ -29,13 +29,63 @@ export function createConversation(
   })
 }
 
-const conversationGetParticipant = (cv: Conversation, name: string) =>
-  cv.participants.find(p => p.id === name)
+// const conversationGetParticipant = (cv: Conversation, name: string) =>
+//   cv.participants.find(p => p.id === name)
 
-export const storageGetParticipant = (storage: IStorage, name: string) =>
-  storage
-    .getState()
-    .conversations.find(cv => conversationGetParticipant(cv, name))
+// const storageGetParticipant = (storage: IStorage, name: string) =>
+//   storage
+//     .getState()
+//     .conversations.find(cv => conversationGetParticipant(cv, name))
+
+function setsAreEqual<T>(a: Set<T>, b: Set<T>) {
+  if (a.size !== b.size) {
+    return false
+  }
+
+  return Array.from(a).every(element => b.has(element))
+}
+
+const conversationHasSameMembers = (
+  conversation: Conversation,
+  /** must not include itself */
+  userIDs: string[],
+) => {
+  const participants = conversation.participants
+
+  if (participants.length !== userIDs.length) {
+    return false
+  }
+
+  const participantIDsSet = new Set(participants.map(p => p.id))
+  const userIDsSet = new Set(userIDs)
+
+  return setsAreEqual(participantIDsSet, userIDsSet)
+}
+
+export const createChat = (
+  ...userEntries: [UserEntry, UserEntry, ...UserEntry[]]
+) => {
+  const chatID = nanoid()
+  const userIDs = userEntries.map(ue => ue.user.id)
+
+  for (const userEntry of userEntries) {
+    const conversations = userEntry.storage.getState().conversations
+    const userID = userEntry.user.id
+    const otherUsers = userEntries.map(e => e.user).filter(u => u.id !== userID)
+    const otherUserIDs = userIDs.filter(u => u !== userID)
+
+    if (
+      conversations.some(cv => conversationHasSameMembers(cv, otherUserIDs))
+    ) {
+      continue
+    }
+
+    const newConversation = createConversation(chatID, otherUserIDs)
+
+    otherUsers.forEach(u => userEntry.storage.addUser(u))
+    userEntry.storage.addConversation(newConversation)
+  }
+}
 
 // sendMessage and addMessage methods can automagically generate id for messages and groups
 // This allows you to omit doing this manually, but you need to provide a message generator
