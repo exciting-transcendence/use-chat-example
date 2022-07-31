@@ -39,7 +39,17 @@ const mockUserEntry = (name: string): UserEntry => {
     avatar: avatar,
     bio: '',
   })
-  const storage = new BasicStorage({ groupIdGenerator, messageIdGenerator })
+
+  const data = window.localStorage.getItem('name')
+  const storage = (() => {
+    if (data) {
+      console.log(`Loading data for ${name}`)
+      return JSON.parse(data) as BasicStorage
+    } else {
+      console.log(`Creating data for ${name}`)
+      return new BasicStorage({ groupIdGenerator, messageIdGenerator })
+    }
+  })()
 
   return { user, storage }
 }

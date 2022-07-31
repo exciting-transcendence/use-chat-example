@@ -24,18 +24,18 @@ function App() {
       >
         <Row className="h-50 pb-2 flex-nowrap">
           <Col>
-            <ChatComponent user={akane.user} storage={akane.storage} />
+            <ChatComponent userEntry={akane} />
           </Col>
           <Col>
-            <ChatComponent user={eliot.user} storage={eliot.storage} />
+            <ChatComponent userEntry={eliot} />
           </Col>
         </Row>
         <Row className="h-50 pt-2 flex-nowrap">
           <Col>
-            <ChatComponent user={emily.user} storage={emily.storage} />
+            <ChatComponent userEntry={emily} />
           </Col>
           <Col>
-            <ChatComponent user={joe.user} storage={joe.storage} />
+            <ChatComponent userEntry={joe} />
           </Col>
         </Row>
       </Container>
