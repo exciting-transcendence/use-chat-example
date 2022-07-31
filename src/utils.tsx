@@ -45,21 +45,21 @@ function setsAreEqual<T>(a: Set<T>, b: Set<T>) {
   return Array.from(a).every(element => b.has(element))
 }
 
-const conversationHasSameMembers = (
+const hasDuplicateMembers = (
   conversation: Conversation,
-  /** must not include itself */
-  userIDs: string[],
+  /** must not include owner of the conversation */
+  otherUserIDs: string[],
 ) => {
   const participants = conversation.participants
 
-  if (participants.length !== userIDs.length) {
+  if (participants.length !== otherUserIDs.length) {
     return false
   }
 
   const participantIDsSet = new Set(participants.map(p => p.id))
-  const userIDsSet = new Set(userIDs)
+  const otherUserIDsSet = new Set(otherUserIDs)
 
-  return setsAreEqual(participantIDsSet, userIDsSet)
+  return setsAreEqual(participantIDsSet, otherUserIDsSet)
 }
 
 export const createChat = (
@@ -74,9 +74,7 @@ export const createChat = (
     const otherUsers = userEntries.map(e => e.user).filter(u => u.id !== userID)
     const otherUserIDs = userIDs.filter(u => u !== userID)
 
-    if (
-      conversations.some(cv => conversationHasSameMembers(cv, otherUserIDs))
-    ) {
+    if (conversations.some(cv => hasDuplicateMembers(cv, otherUserIDs))) {
       continue
     }
 
