@@ -116,53 +116,47 @@ function createConversation(id: ConversationId, name: string): Conversation {
 }
 
 // Add users and conversations to the states
+const newUser = (u: { name: string; avatar: string }) => {
+  return new User({
+    id: u.name,
+    presence: new Presence({
+      status: UserStatus.Available,
+      description: '',
+    }),
+    firstName: '',
+    lastName: '',
+    username: u.name,
+    email: '',
+    avatar: u.avatar,
+    bio: '',
+  })
+}
+
+const isMyConversation = (storage: IStorage, name: string) => {
+  const conversations = storage.getState().conversations
+  const foo = (cv: Conversation) =>
+    typeof cv.participants.find(p => p.id === name) !== 'undefined'
+
+  return Boolean(conversations.find(foo))
+}
+
 chats.forEach(c => {
-  users.forEach(u => {
-    if (u.name !== c.name) {
-      c.storage.addUser(
-        new User({
-          id: u.name,
-          presence: new Presence({
-            status: UserStatus.Available,
-            description: '',
-          }),
-          firstName: '',
-          lastName: '',
-          username: u.name,
-          email: '',
-          avatar: u.avatar,
-          bio: '',
-        }),
-      )
+  const otherUsers = users.filter(u => u.name !== c.name)
+  otherUsers.forEach(u => c.storage.addUser(newUser(u)))
 
-      const conversationId = nanoid()
+  const foo = otherUsers.filter(u => !isMyConversation(c.storage, u.name))
 
-      const myConversation = c.storage
-        .getState()
-        .conversations.find(
-          cv =>
-            typeof cv.participants.find(p => p.id === u.name) !== 'undefined',
-        )
-      if (!myConversation) {
-        c.storage.addConversation(createConversation(conversationId, u.name))
+  foo.forEach(u => {
+    const conversationId = nanoid()
+    c.storage.addConversation(createConversation(conversationId, u.name))
 
-        const chat = chats.find(chat => chat.name === u.name)
+    const myChat = chats.find(chat => chat.name === u.name)
+    if (!myChat) {
+      return
+    }
 
-        if (chat) {
-          const hisConversation = chat.storage
-            .getState()
-            .conversations.find(
-              cv =>
-                typeof cv.participants.find(p => p.id === c.name) !==
-                'undefined',
-            )
-          if (!hisConversation) {
-            chat.storage.addConversation(
-              createConversation(conversationId, c.name),
-            )
-          }
-        }
-      }
+    if (!isMyConversation(myChat.storage, c.name)) {
+      myChat.storage.addConversation(createConversation(conversationId, c.name))
     }
   })
 })
