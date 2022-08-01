@@ -6,10 +6,12 @@ import { useEffect } from 'react'
 
 export const ChatComponent = ({ userEntry }: { userEntry: UserEntry }) => {
   useEffect(() => {
-    const data = JSON.stringify(userEntry.storage)
-    localStorage.setItem(userEntry.user.id, data)
-    console.log(`${userEntry.user.username}: data saved`)
-  }, [userEntry.storage])
+    setInterval(() => {
+      const data = JSON.stringify(userEntry)
+      localStorage.setItem(userEntry.user.username, data)
+      console.log(`${userEntry.user.username}: data saved`)
+    }, 3000)
+  }, [])
 
   return (
     <ChatProvider

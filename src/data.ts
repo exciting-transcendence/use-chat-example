@@ -24,9 +24,8 @@ export interface UserEntry {
   storage: IStorage
 }
 
-const mockUserEntry = (name: string): UserEntry => {
-  const avatar = `https://picsum.photos/200/300/?random&rnd${nanoid()}`
-  const user = new User({
+const mockUser = (name: string, avatar: string) => {
+  return new User({
     id: nanoid(),
     presence: new Presence({
       status: UserStatus.Available,
@@ -39,19 +38,21 @@ const mockUserEntry = (name: string): UserEntry => {
     avatar: avatar,
     bio: '',
   })
+}
 
-  const data = window.localStorage.getItem('name')
-  const storage = (() => {
-    if (data) {
-      console.log(`Loading data for ${name}`)
-      return JSON.parse(data) as BasicStorage
-    } else {
-      console.log(`Creating data for ${name}`)
-      return new BasicStorage({ groupIdGenerator, messageIdGenerator })
-    }
-  })()
+const mockUserEntry = (name: string): UserEntry => {
+  const data = window.localStorage.getItem(name)
+  if (data) {
+    console.log(`Loading data for ${name}`)
+    return JSON.parse(data) as UserEntry
+  } else {
+    console.log(`Creating data for ${name}`)
 
-  return { user, storage }
+    const avatar = `https://picsum.photos/200/300/?random&rnd${nanoid()}`
+    const user = mockUser(name, avatar)
+    const storage = new BasicStorage({ groupIdGenerator, messageIdGenerator })
+    return { user, storage }
+  }
 }
 
 const mockNames = ['Akane', 'Eliot', 'Emily', 'Joe']
